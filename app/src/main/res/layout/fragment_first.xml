@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/blanc"
+    tools:context=".FirstFragment">
+
+
+
+    <Button
+        android:id="@+id/start_button"
+        android:layout_width="142dp"
+        android:layout_height="54dp"
+        android:layout_marginBottom="28dp"
+        android:background="@color/lila_fosc"
+        android:text="@string/start_button"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.41"
+        app:layout_constraintStart_toEndOf="@+id/stop_button" />
+
+    <Button
+        android:id="@+id/stop_button"
+        android:layout_width="129dp"
+        android:layout_height="53dp"
+
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="28dp"
+        android:background="@color/lila_fosc"
+        android:text="@string/stop_button"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:strokeColor="@color/lila_fosc" />
+
+    <TextView
+        android:id="@+id/textview_ip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/ip"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewVPNStatus" />
+
+    <TextView
+        android:id="@+id/textViewVPNStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:text="1"
+        android:textSize="20sp"
+        app:layout_constraintTop_toBottomOf="@+id/totalConnectionsCountTextView"
+        tools:layout_editor_absoluteX="27dp" />
+
+    <TextView
+        android:id="@+id/openPortsCountTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Open Ports: 0"
+        android:textSize="20sp"
+        tools:layout_editor_absoluteX="27dp"
+        tools:layout_editor_absoluteY="28dp" />
+
+    <TextView
+        android:id="@+id/closedPortsCountTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Closed Ports: 0"
+        android:textSize="20sp"
+        app:layout_constraintTop_toBottomOf="@+id/openPortsCountTextView"
+        tools:layout_editor_absoluteX="27dp" />
+
+    <TextView
+        android:id="@+id/totalConnectionsCountTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Total Connections: 0"
+        android:textSize="20sp"
+        app:layout_constraintTop_toBottomOf="@+id/closedPortsCountTextView"
+        tools:layout_editor_absoluteX="27dp" />
+</androidx.constraintlayout.widget.ConstraintLayout>

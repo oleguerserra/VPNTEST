@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">VPN TEST</string>
+    <string name="stop_button">Para</string>
+    <string name="previous">Anterior</string>
+    <string name="ip">IP: </string>
+    <string name="first_fragment_label">Eines de test VPN</string>
+    <string name="action_settings">Tanca</string>
+    <string name="second_fragment_label">Pantalla 2</string>
+    <string name="hello_second_fragment">Hola pantalla 2. Arg: %1$s</string>
+    <string name="start_button">Inicia</string>
+</resources>
