@@ -9,6 +9,9 @@ import signal
 LOG_FILE = 'connections.csv'
 PORT_RANGE = range(25, 101)  # Change this to the range of ports you want to listen on
 
+# Store the PID of the background service process
+background_service_pid = None
+
 # Define a function to listen on a single port
 def listen_on_port(port):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -47,6 +50,7 @@ def listen_on_port(port):
 # Start a new thread for each port in the range
 threads = []
 
+
 def open_sockets():
     for port in PORT_RANGE:
         t = threading.Thread(target=listen_on_port, args=(port,))
@@ -54,6 +58,7 @@ def open_sockets():
         t.start()
 
 def stop_sockets():
+    global background_service_pid  # Declare background_service_pid as a global variable
     os.kill(background_service_pid, signal.SIGTERM)
 
 def start_background_service():
@@ -69,6 +74,7 @@ def start_background_service():
         sys.exit(0)
 
 def stop_background_service():
+    global background_service_pid  # Declare background_service_pid as a global variable
     if background_service_pid is not None:
         os.kill(background_service_pid, signal.SIGTERM)
         print(f'Stopping background service with PID {background_service_pid}')
