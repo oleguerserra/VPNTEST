@@ -54,7 +54,7 @@ def open_sockets():
         t.start()
 
 def stop_sockets():
-    os.kill(os.getpid(), signal.SIGTERM)
+    os.kill(background_service_pid, signal.SIGTERM)
 
 def start_background_service():
     pid = os.fork()
@@ -63,18 +63,18 @@ def start_background_service():
         open_sockets()
     else:
         # Parent process
+        global background_service_pid
+        background_service_pid = pid
         print(f'Started background service with PID {pid}')
         sys.exit(0)
 
 def stop_background_service():
-    pid = os.fork()
-    if pid == 0:
-        # Child process
-        stop_sockets()
+    if background_service_pid is not None:
+        os.kill(background_service_pid, signal.SIGTERM)
+        print(f'Stopping background service with PID {background_service_pid}')
+        background_service_pid = None
     else:
-        # Parent process
-        print(f'Stopped background service with PID {pid}')
-        sys.exit(0)
+        print('Background service is not running.')
 
 def main():
     if len(sys.argv) != 2 or sys.argv[1] not in ['start', 'stop']:
