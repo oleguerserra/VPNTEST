@@ -32,10 +32,7 @@ public class FirstFragment extends Fragment {
     //private TextView showCountTextView;
 
     @Override
-    public View onCreateView(
-            LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState
-    ) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
 
         binding = FragmentFirstBinding.inflate(inflater, container, false);
         widgetUpdater = new WidgetUpdater(binding.openPortsCountTextView,
@@ -48,15 +45,12 @@ public class FirstFragment extends Fragment {
         IntentFilter intentFilter = new IntentFilter("UPDATE_COUNTERS");
         requireActivity().registerReceiver(widgetUpdater, intentFilter);
 
-
-
         binding.textViewVPNStatus.setText("Connectat: ...checking");
         binding.textViewVPNStatus.append("\nVPN: ...checking");
 
         startBackgroundService();
 
         return binding.getRoot();
-
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {

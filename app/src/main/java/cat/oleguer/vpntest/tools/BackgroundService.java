@@ -9,15 +9,19 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.util.Log;
 import android.R;
 
 import androidx.core.app.NotificationCompat;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -27,9 +31,12 @@ import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.UUID;
 
 import okhttp3.Call;
@@ -54,6 +61,8 @@ public class BackgroundService extends Service {
     private int openPortsCount = 0;
     private int closedPortsCount = 0;
     private int totalConnectionsCount = 0;
+
+    private HashMap<String,Geolocation> storedIPs = new HashMap<>();
 
     @Override
     public void onCreate() {
@@ -111,6 +120,18 @@ public class BackgroundService extends Service {
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()) {
                     String myIp = response.body().string();
+                    if (!storedIPs.containsKey(myIp)) {
+                        // IP has changed, store the new IP and timestamp
+                        Geolocation geoLocalization = IPGeolocation.getLocalization(myIp);
+                        storedIPs.put(myIp,geoLocalization);
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                        String timestamp = sdf.format(new Date());
+
+                        logIP(timestamp, myIp);
+                        Log.d(TAG,"Found New IP: " + myIp);
+                        // Store the new IP and timestamp
+                        // storeIPAndTimestamp(myIp, timestamp);
+                    }
                     resolveAndScanPorts(myIp);
                 } else {
                     Log.e(TAG, "Failed to retrieve public IP address: " + response.message());
@@ -146,7 +167,8 @@ public class BackgroundService extends Service {
     private void scanPorts(String myIp, String remoteIp) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         String timestamp = sdf.format(new Date());
-
+        boolean match = false;
+        String responseIp = "";
         for (int port = startPort; port <= endPort; port++) {
             try {
                 // Open a TCP connection to the remote server
@@ -162,33 +184,74 @@ public class BackgroundService extends Service {
                 // Convert the UUID to a hexadecimal string
                 String hexString = uuidToHexString(uuid);
 
-                String message = timestamp + "," + myIp + "," + hexString;
+                // Generate a mobile unique identifyer
+
+                String muid = Settings.Secure.getString(getApplicationContext().getContentResolver(),Settings.Secure.ANDROID_ID)
+                                + "-" + Build.BRAND + "-" + Build.MODEL;
+
+                String message = timestamp + "," + muid + "," + myIp + "," + hexString + "," + storedIPs.get((myIp).toString());
 
                 writer.write(message);
                 writer.newLine();
                 writer.flush();
 
+                // Read the response from the stream
+                InputStream inputStream = socket.getInputStream();
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+                BufferedReader reader = new BufferedReader(inputStreamReader);
+
+                String response = reader.readLine();
+
+                // Parse the response and compare IP and UUID values
+                if (response != null) {
+                    String[] values = response.split(",");
+                    if (values.length >= 2) {
+                        responseIp = values[0].trim();
+                        String responseUuid = values[1].trim();
+
+                        if (responseIp.equals(myIp) && responseUuid.equals(hexString)) {
+                            // IP and UUID match
+                            Log.d(TAG,"IP and UUID match the response.");
+                            match=true;
+                        } else {
+                            // IP or UUID do not match
+                            Log.d(TAG,"IP or UUID do not match the response."+ responseIp + "- " + myIp + "-" + responseUuid + "-" + hexString);
+                        }
+                    } else {
+                        // Invalid response format
+                        Log.d(TAG,"Invalid response format.");
+                    }
+                } else {
+                    // No response received
+                    Log.d(TAG,"No response received.");
+                }
+
+                // Close the streams and socket
+                reader.close();
+                inputStreamReader.close();
+                inputStream.close();
+
                 writer.close();
                 outputStreamWriter.close();
                 outputStream.close();
-
+                socket.close();
 
 
                 // Store the response in a CSV file
-                storeResponse(timestamp, myIp, remoteIp, port, "Open", hexString);
+                storeResponse(timestamp, myIp, remoteIp, port, "Open", responseIp, match, hexString);
                 openPortsCount++;
                 // Close the socket
                 socket.close();
             } catch (IOException e) {
                 // Port is closed or an error occurred
                 closedPortsCount++;
-                storeResponse(timestamp, myIp, remoteIp, port, "Closed", "");
+                storeResponse(timestamp, myIp, remoteIp, port, "Closed", responseIp, match, "");
             }
             totalConnectionsCount++;
         }
     }
 
-    private void storeResponse(String timestamp, String myIp, String remoteIp, int port, String status, String uuid) {
+    private void storeResponse(String timestamp, String myIp, String remoteIp, int port, String status, String responseIp, boolean match, String uuid) {
         String filepath = "";
         try {
             // Append the response to a CSV file
@@ -196,8 +259,8 @@ public class BackgroundService extends Service {
             File file = new File(path, "response.csv");
 
             PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(file, true)));
-            writer.println(timestamp + "," + myIp + "," + remoteIp + "," + port + "," + status + "," + uuid);
-            Log.d(TAG,file.getAbsolutePath()+ "," +timestamp + "," + myIp + "," + remoteIp + "," + port + "," + status + "," + uuid);
+            writer.println(timestamp + "," + myIp + "," + remoteIp + "," + port + "," + status + "," + responseIp + "," + match + "," + uuid + "," + storedIPs.get(myIp).toString());
+            Log.d(TAG,file.getAbsolutePath()+ "," +timestamp + "," + myIp + "," + remoteIp + "," + port + "," + status + "," + responseIp + "," + match + "," + uuid + "," + storedIPs.get(myIp).toString());
             writer.close();
             filepath = file.getAbsolutePath();
         } catch (IOException e) {
@@ -243,9 +306,10 @@ public class BackgroundService extends Service {
                                                 + "\nVPN Info: " + checkNetwork
                                                 + "\nKill Switch: " + killSwitch
                                                 + "\nIP List: " + ipListString
-                                                + "\nDNS List: " + dnsListString
-                                                + "\nRoutes: " + routesListString
-                                                + "\nServer Running: " + checkServer);
+                                                //+ "\nDNS List: " + dnsListString
+                                                //+ "\nRoutes: " + routesListString
+                                                //+ "\nServer Running: " + checkServer);
+                                                + "\nLocation: " + storedIPs.get(myIp).toString());
         sendBroadcast(updateIntent);
     }
 
@@ -303,6 +367,21 @@ public class BackgroundService extends Service {
             return stringBuilder.toString();
         }
 
+    public static void logIP(String timestamp, String ip) {
+        try {
+            File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            File file = new File(path, "ips.csv");
+            PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(file, true)));
 
+            // Append a new line to the CSV file with timestamp and IP
+            writer.println(timestamp + "," + ip);
+            writer.flush();
+            writer.close();
+
+            Log.d(TAG,"IP logged successfully. Timestamp: " + timestamp + ", IP: " + ip);
+        } catch (IOException e) {
+            System.err.println("Error logging IP: " + e.getMessage());
+        }
+    }
 
 }
