@@ -354,10 +354,7 @@ public class BackgroundService extends Service {
                                                 //+ "\nDNS List: " + dnsListString
                                                 //+ "\nRoutes: " + routesListString
                                                 //+ "\nServer Running: " + checkServer);
-                                                + "\nLocation: " + localStoredIPs.get(myIp).toString()
-                                                + "\nLog files location: "+ fileStatus
-                                                + "\nFiles Dir: " + getApplicationContext().getFilesDir());
-
+                                                + "\nLocation: " + localStoredIPs.get(myIp).toString());
         sendBroadcast(updateIntent);
     }
 

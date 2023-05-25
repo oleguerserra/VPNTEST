@@ -34,11 +34,52 @@
         app:strokeColor="@color/lila_fosc" />
 
     <TextView
+        android:id="@+id/totalConnectionsCountTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Total Connections: 0"
+        android:textSize="20sp"
+        app:layout_constraintTop_toBottomOf="@+id/closedPortsCountTextView"
+        tools:layout_editor_absoluteX="27dp" />
+
+    <TextView
+        android:id="@+id/openPortsCountTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="33dp"
+        android:text="Open Ports: 0"
+        android:textSize="20sp"
+        app:layout_constraintTop_toBottomOf="@+id/titleFirstList"
+        tools:layout_editor_absoluteX="27dp" />
+
+    <TextView
+        android:id="@+id/closedPortsCountTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Closed Ports: 0"
+        android:textSize="20sp"
+        app:layout_constraintTop_toBottomOf="@+id/openPortsCountTextView"
+        tools:layout_editor_absoluteX="27dp" />
+
+    <TextView
+        android:id="@+id/titleFirstList"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:fontFamily="sans-serif-black"
+        android:text="List of scanned parameters"
+        android:textSize="20sp"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="32dp" />
+
+    <TextView
         android:id="@+id/textview_ip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="16dp"
         android:text="@string/ip"
         android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
@@ -49,36 +90,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
+        android:layout_marginTop="4dp"
         android:text="1"
         android:textSize="20sp"
         app:layout_constraintTop_toBottomOf="@+id/totalConnectionsCountTextView"
-        tools:layout_editor_absoluteX="27dp" />
-
-    <TextView
-        android:id="@+id/openPortsCountTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="Open Ports: 0"
-        android:textSize="20sp"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteX="27dp" />
-
-    <TextView
-        android:id="@+id/closedPortsCountTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Closed Ports: 0"
-        android:textSize="20sp"
-        app:layout_constraintTop_toBottomOf="@+id/openPortsCountTextView"
-        tools:layout_editor_absoluteX="27dp" />
-
-    <TextView
-        android:id="@+id/totalConnectionsCountTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Total Connections: 0"
-        android:textSize="20sp"
-        app:layout_constraintTop_toBottomOf="@+id/closedPortsCountTextView"
         tools:layout_editor_absoluteX="27dp" />
 </androidx.constraintlayout.widget.ConstraintLayout>
