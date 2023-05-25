@@ -12,7 +12,13 @@ android {
         targetSdk 32
         versionCode 1
         versionName "1.0"
-
+        manifestPlaceholders = [
+                INTERVAL: "5000",
+                HOSTNAME: "vpn.serra.cat",
+                START_PORT: "80",
+                END_PORT: "81",
+                IPGEOLOCATION_API_KEY: "110df17c1d27413cbd494088bb39a539"
+        ]
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 

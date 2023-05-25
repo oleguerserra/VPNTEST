@@ -7,6 +7,8 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -47,6 +49,21 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="@string/default_notification_channel_id" />
+        <meta-data
+            android:name="INTERVAL"
+            android:value="${INTERVAL}" />
+        <meta-data
+            android:name="HOSTNAME"
+            android:value="${HOSTNAME}" />
+        <meta-data
+            android:name="START_PORT"
+            android:value="${START_PORT}" />
+        <meta-data
+            android:name="END_PORT"
+            android:value="${END_PORT}" />
+        <meta-data
+            android:name="IPGEOLOCATION_API_KEY"
+            android:value="${IPGEOLOCATION_API_KEY}" />
     </application>
 
 </manifest>

@@ -32,11 +32,9 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import java.util.UUID;
 
 import okhttp3.Call;
@@ -47,12 +45,10 @@ import okhttp3.Response;
 
 public class BackgroundService extends Service {
     private static final String TAG = "BackgroundService";
-
-    private static final int INTERVAL = 5000; // Interval for repeating the process in milliseconds
+    private static int INTERVAL = 5000; // Interval for repeating the process in milliseconds
     private static final int NOTIFICATION_ID = 1;
     private static final String CHANNEL_ID = "testvpn_channel_id";
-
-    private String hostname = "vpn.serra.cat";
+    private String hostname = "";
     private int startPort = 80;
     private int endPort = 81;
     private boolean isRunning;
@@ -61,8 +57,9 @@ public class BackgroundService extends Service {
     private int openPortsCount = 0;
     private int closedPortsCount = 0;
     private int totalConnectionsCount = 0;
-
-    private HashMap<String,Geolocation> storedIPs = new HashMap<>();
+    private HashMap<String,Geolocation> localStoredIPs = new HashMap<>();
+    private HashMap<String,Geolocation> remoteStoredIPs = new HashMap<>();
+    private Intent myIntent;
 
     @Override
     public void onCreate() {
@@ -76,6 +73,7 @@ public class BackgroundService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        myIntent = intent;
         if (intent != null) {
             String action = intent.getAction();
             if (action != null) {
@@ -110,6 +108,7 @@ public class BackgroundService extends Service {
     }
 
     private void resolveHostnameAndScanPorts() {
+        //Calling the service https://www.ipify.org/ whating for call back.
         makeIpifyRequest(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -120,17 +119,16 @@ public class BackgroundService extends Service {
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()) {
                     String myIp = response.body().string();
-                    if (!storedIPs.containsKey(myIp)) {
+                    Log.d(TAG,"Resolved my IP:" + myIp);
+                    if (!localStoredIPs.containsKey(myIp)) {
                         // IP has changed, store the new IP and timestamp
-                        Geolocation geoLocalization = IPGeolocation.getLocalization(myIp);
-                        storedIPs.put(myIp,geoLocalization);
+                        Geolocation geoLocalization = IPGeolocation.getLocalization(myIp,myIntent);
+                        Log.d(TAG,"Geoloalized IP:" + geoLocalization.toString());
+                        localStoredIPs.put(myIp,geoLocalization);
                         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
                         String timestamp = sdf.format(new Date());
-
-                        logIP(timestamp, myIp);
+                        logIP(timestamp, myIp, "local", geoLocalization.toString());
                         Log.d(TAG,"Found New IP: " + myIp);
-                        // Store the new IP and timestamp
-                        // storeIPAndTimestamp(myIp, timestamp);
                     }
                     resolveAndScanPorts(myIp);
                 } else {
@@ -140,6 +138,11 @@ public class BackgroundService extends Service {
         });
     }
 
+    /**
+     * Let's find our IP using the free online service  https://www.ipify.org/
+     *
+     * @param callback
+     */
     private void makeIpifyRequest(Callback callback) {
         Request request = new Request.Builder()
                 .url("https://api.ipify.org")
@@ -164,9 +167,14 @@ public class BackgroundService extends Service {
         }).start();
     }
 
+    /**
+     * Scanm all ports of a remote server with the ip: remoteIP
+     * It will scan all ports defined between START_PORT and END_PORT in the configuration file: build.gradle
+     *
+     * @param myIp IP from the https://www.ipify.org/ service
+     * @param remoteIp Repote IP defined by the HOSTNAME in the configuration file: build.gradle
+     */
     private void scanPorts(String myIp, String remoteIp) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-        String timestamp = sdf.format(new Date());
         boolean match = false;
         String responseIp = "";
         for (int port = startPort; port <= endPort; port++) {
@@ -179,17 +187,19 @@ public class BackgroundService extends Service {
                 BufferedWriter writer = new BufferedWriter(outputStreamWriter);
 
                 // Generate a random UUID
-                UUID uuid = UUID.randomUUID();
-
-                // Convert the UUID to a hexadecimal string
-                String hexString = uuidToHexString(uuid);
+                String hexString = uuidToHexString(UUID.randomUUID());
 
                 // Generate a mobile unique identifyer
-
                 String muid = Settings.Secure.getString(getApplicationContext().getContentResolver(),Settings.Secure.ANDROID_ID)
                                 + "-" + Build.BRAND + "-" + Build.MODEL;
 
-                String message = timestamp + "," + muid + "," + myIp + "," + hexString + "," + storedIPs.get((myIp).toString());
+                /**
+                 *  Sending a message through the socket
+                 *
+                 *  [Timestamp, muid, myIP, uuid, geoloc]
+                 *
+                 */
+                String message = getTimeStamp() + "," + muid + "," + myIp + "," + hexString + "," + localStoredIPs.get((myIp).toString());
 
                 writer.write(message);
                 writer.newLine();
@@ -202,12 +212,33 @@ public class BackgroundService extends Service {
 
                 String response = reader.readLine();
 
-                // Parse the response and compare IP and UUID values
+                /**
+                 * Parse the response and compare IP and UUID values
+                 * The response must have the following format:
+                 *
+                 * [remote IP Address, UUID]
+                 *
+                 */
                 if (response != null) {
                     String[] values = response.split(",");
                     if (values.length >= 2) {
+                        // Getting remote IP from response
                         responseIp = values[0].trim();
+
+                        // Storing remote IP if it is new
+                        if (!remoteStoredIPs.containsKey(responseIp)) {
+                            // Remote Storede IP has changed, store the new IP and timestamp
+                            Geolocation geoLocalization = IPGeolocation.getLocalization(responseIp,myIntent);
+                            Log.d(TAG,"Geoloalized Remote Stored IP:" + geoLocalization.toString());
+                            remoteStoredIPs.put(responseIp,geoLocalization);
+                            logIP(getTimeStamp(), responseIp, "remote", geoLocalization.toString());
+                            Log.d(TAG,"Found New Remote Stored IP: " + responseIp);
+                        }
+
                         String responseUuid = values[1].trim();
+
+                        // We raise an alert for the log if remote ip is diferent from my ip and if the received uuid
+                        // is different from the uuid we sent before.
 
                         if (responseIp.equals(myIp) && responseUuid.equals(hexString)) {
                             // IP and UUID match
@@ -238,29 +269,41 @@ public class BackgroundService extends Service {
 
 
                 // Store the response in a CSV file
-                storeResponse(timestamp, myIp, remoteIp, port, "Open", responseIp, match, hexString);
+                storeResponse(getTimeStamp(), myIp, remoteIp, port, "Open", responseIp, match, hexString);
                 openPortsCount++;
                 // Close the socket
                 socket.close();
             } catch (IOException e) {
                 // Port is closed or an error occurred
                 closedPortsCount++;
-                storeResponse(timestamp, myIp, remoteIp, port, "Closed", responseIp, match, "");
+                storeResponse(getTimeStamp(), myIp, remoteIp, port, "Closed", responseIp, match, "");
             }
             totalConnectionsCount++;
         }
     }
 
+    /**
+     * Writes a local file response.csv with all params needed to debug
+     * @param timestamp
+     * @param myIp  IP from the https://www.ipify.org/ service
+     * @param remoteIp  IP of the server we are connecting
+     * @param port  Server's port we are accessing
+     * @param status    Port open / closed
+     * @param responseIp    The IP the server says it has
+     * @param match true if Local IP, Response IP, Sent and recived UUID match
+     * @param uuid
+     */
     private void storeResponse(String timestamp, String myIp, String remoteIp, int port, String status, String responseIp, boolean match, String uuid) {
         String filepath = "";
         try {
             // Append the response to a CSV file
+
             File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
             File file = new File(path, "response.csv");
 
             PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(file, true)));
-            writer.println(timestamp + "," + myIp + "," + remoteIp + "," + port + "," + status + "," + responseIp + "," + match + "," + uuid + "," + storedIPs.get(myIp).toString());
-            Log.d(TAG,file.getAbsolutePath()+ "," +timestamp + "," + myIp + "," + remoteIp + "," + port + "," + status + "," + responseIp + "," + match + "," + uuid + "," + storedIPs.get(myIp).toString());
+            writer.println(timestamp + "," + myIp + "," + remoteIp + "," + port + "," + status + "," + responseIp + "," + match + "," + uuid + "," + localStoredIPs.get(myIp).toString());
+            Log.d(TAG,file.getAbsolutePath()+ "," +timestamp + "," + myIp + "," + remoteIp + "," + port + "," + status + "," + responseIp + "," + match + "," + uuid + "," + localStoredIPs.get(myIp).toString());
             writer.close();
             filepath = file.getAbsolutePath();
         } catch (IOException e) {
@@ -309,7 +352,7 @@ public class BackgroundService extends Service {
                                                 //+ "\nDNS List: " + dnsListString
                                                 //+ "\nRoutes: " + routesListString
                                                 //+ "\nServer Running: " + checkServer);
-                                                + "\nLocation: " + storedIPs.get(myIp).toString());
+                                                + "\nLocation: " + localStoredIPs.get(myIp).toString());
         sendBroadcast(updateIntent);
     }
 
@@ -324,18 +367,21 @@ public class BackgroundService extends Service {
     }
 
 
-
+    /**
+     * Create the notification channel (required for Android Oreo and above)
+     * @return
+     */
     private Notification createNotification() {
-        // Create the notification channel (required for Android Oreo and above)
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "Foreground Service", NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "TESTVPN Foreground Service", NotificationManager.IMPORTANCE_DEFAULT);
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
         }
 
         // Build and return the notification
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("Foreground Service")
+                .setContentTitle("TESTVPN Foreground Service")
                 .setContentText("Running in the background")
                 .setSmallIcon(R.drawable.ic_notification_overlay);
 
@@ -344,9 +390,14 @@ public class BackgroundService extends Service {
     }
 
 
-
-
-        private static String uuidToHexString(UUID uuid) {
+    /**
+     * Returns an hexadecimal representation of a random UUID
+     * https://www.cockroachlabs.com/blog/what-is-a-uuid/
+     *
+     * @param uuid
+     * @return
+     */
+     private static String uuidToHexString(UUID uuid) {
             long mostSignificantBits = uuid.getMostSignificantBits();
             long leastSignificantBits = uuid.getLeastSignificantBits();
 
@@ -365,16 +416,26 @@ public class BackgroundService extends Service {
             }
 
             return stringBuilder.toString();
-        }
+     }
 
-    public static void logIP(String timestamp, String ip) {
+    /**
+     * Writes a CSV File logging all found IP
+     *
+     * [timestamp, ip, local / remote, geolocation]
+     *
+     * @param timestamp
+     * @param ip
+     * @param localOrRemote
+     * @param geoLoc
+     */
+    public void logIP(String timestamp, String ip, String localOrRemote, String geoLoc) {
         try {
             File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
             File file = new File(path, "ips.csv");
             PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(file, true)));
 
             // Append a new line to the CSV file with timestamp and IP
-            writer.println(timestamp + "," + ip);
+            writer.println(timestamp + "," + ip + "," + localOrRemote + "," + geoLoc);
             writer.flush();
             writer.close();
 
@@ -382,6 +443,15 @@ public class BackgroundService extends Service {
         } catch (IOException e) {
             System.err.println("Error logging IP: " + e.getMessage());
         }
+    }
+
+    /**
+     *
+     * @return Timestamp in "yyyy-MM-dd HH:mm:ss" format
+     */
+    private static String getTimeStamp(){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        return sdf.format(new Date());
     }
 
 }

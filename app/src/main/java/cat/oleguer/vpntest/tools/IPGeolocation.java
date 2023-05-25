@@ -1,7 +1,7 @@
 package cat.oleguer.vpntest.tools;
 
 import android.util.Log;
-
+import android.content.Intent;
 import com.google.gson.Gson;
 
 import java.io.BufferedReader;
@@ -13,11 +13,16 @@ public class IPGeolocation {
 
     private static final String TAG = "IPGeolocation";
 
-    public static Geolocation getLocalization(String ipAddress) {
+    public static Geolocation getLocalization(String ipAddress, Intent intent) {
 
+        String ipgeolocation_api_key = intent.getStringExtra("ipgeolocation_api_key");
+        Log.d(TAG, "ipgeolocation_api_key= " + ipgeolocation_api_key);
         try {
             // Create the API URL
-            String apiUrl = "https://api.ipgeolocation.io/ipgeo?apiKey=110df17c1d27413cbd494088bb39a539&ip=" + ipAddress;
+
+
+            String apiUrl = "https://api.ipgeolocation.io/ipgeo?apiKey=" + ipgeolocation_api_key + "&ip=" + ipAddress;
+            //String apiUrl = "https://api.ipgeolocation.io/ipgeo?apiKey=110df17c1d27413cbd494088bb39a539&ip=" + ipAddress;
             // Replace YOUR_API_KEY with your actual API key from IPGeolocation.io
 
 

@@ -52,9 +52,6 @@ public class VPNUtils {
         return false;
     }
 
-
-
-
     // Check the status of the VPN kill switch
     public static boolean isKillSwitchEnabled(Context context) {
         try {

@@ -1,8 +1,6 @@
 package cat.oleguer.vpntest;
 
 import android.app.ActivityManager;
-import android.appwidget.AppWidgetManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -11,18 +9,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RemoteViews;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.fragment.NavHostFragment;
 
 import cat.oleguer.vpntest.databinding.FragmentFirstBinding;
 import cat.oleguer.vpntest.tools.BackgroundService;
-import cat.oleguer.vpntest.tools.NetworkTools;
-import cat.oleguer.vpntest.tools.VPNUtils;
+import cat.oleguer.vpntest.tools.StartBackgroundService;
 import cat.oleguer.vpntest.tools.WidgetUpdater;
 
 public class FirstFragment extends Fragment {
@@ -62,11 +55,12 @@ public class FirstFragment extends Fragment {
                 if (isMyServiceRunning(BackgroundService.class)){
                     Log.d(TAG,"Service already running - let's try to stop it");
                 }
-                Log.d(TAG,"Hem premut el botó i apaguem el servei");
+                Log.d(TAG,"Stop button pressed. Stopping service.");
                 try {
                     Intent stopIntent = new Intent(getContext(), BackgroundService.class);
                     stopIntent.setAction("STOP");
                     getContext().startService(stopIntent);
+                    Log.d(TAG,"Service stopped");
                 } catch (Exception e) {
                     Log.d("Excepction",e.getMessage());
                 }
@@ -76,15 +70,10 @@ public class FirstFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 try {
-                    /** Comencem a mirar servidor **/
+                    Log.d(TAG,"Starting Background Service");
                     startBackgroundService();
-
-
                 } catch (Exception e) {
-                    Log.d("Excepction",e.getMessage());
-                    //myToast = Toast.makeText(getActivity(),"4", Toast.LENGTH_LONG);
-                    //myToast.show();
-
+                    Log.d(TAG,"Error starting backround service" + e.getMessage());
                 }
             }
         });
@@ -95,21 +84,14 @@ public class FirstFragment extends Fragment {
             if (isMyServiceRunning(BackgroundService.class)){
                 Log.d(TAG,"Service already running");
             } else {
-
-                Intent startIntent = new Intent(getContext(), BackgroundService.class);
-                Log.d(TAG, "Comencem a mirar el servidor" + startIntent.toString());
-
-                startIntent.setAction("START");
-                startIntent.putExtra("hostname", "vpn.serra.cat");
-                startIntent.putExtra("startPort", 80);
-                startIntent.putExtra("endPort", 84);
-                getContext().startService(startIntent);
+                StartBackgroundService.startBackgroundService(getContext());
             }
         } catch (Exception e) {
             Log.d("Excepction","Error starting Background Service" + e.getMessage());
         }
     }
 
+    /*
     private void countMe(View view) throws Exception {
         // Get the value of the text view
 
@@ -124,12 +106,7 @@ public class FirstFragment extends Fragment {
         String countstring = count.toString();
         Toast myToast = Toast.makeText(getActivity(),countstring, Toast.LENGTH_SHORT);
         myToast.show();
-
-
-
-
-
-    }
+    }*/
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getActivity().getSystemService(Context.ACTIVITY_SERVICE);
@@ -159,19 +136,20 @@ public class FirstFragment extends Fragment {
             }
         }
     }*/
-
+    /*
     private void updateWidgetUI(Context context, int openPortsCount, int closedPortsCount, int totalConnectionsCount) {
         //binding.textViewOleguer.setText("Open Ports: " + openPortsCount +"\n Closed Ports: " + closedPortsCount);
 
-        /*RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.your_widget_layout);
+        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.your_widget_layout);
 
         views.setTextViewText(R.id.openPortsCountTextView, "Open Ports: " + openPortsCount);
         views.setTextViewText(R.id.closedPortsCountTextView, "Closed Ports: " + closedPortsCount);
         views.setTextViewText(R.id.totalConnectionsCountTextView, "Total Connections: " + totalConnectionsCount);
 
         // Update the widget with the new RemoteViews
-        AppWidgetManager.getInstance(context).updateAppWidget(new ComponentName(context, YourAppWidgetProvider.class), views);*/
+        AppWidgetManager.getInstance(context).updateAppWidget(new ComponentName(context, YourAppWidgetProvider.class), views);
     }
+    */
 
     @Override
     public void onDestroyView() {

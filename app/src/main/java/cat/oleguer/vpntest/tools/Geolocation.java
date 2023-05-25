@@ -145,7 +145,11 @@ public class Geolocation {
 
     @Override
     public String toString() {
-        return countryName + "-" + isp + "-" + organization + "-" + latitude + "." + longitude;
+        try {
+            return countryName + "-" + isp + "-" + organization + "-" + latitude + "." + longitude;
+        } catch (Exception e) {
+            return "";
+        }
         /*return "Geolocation{" +
                 "ip='" + ip + '\'' +
                 ", continentCode='" + continentCode + '\'' +

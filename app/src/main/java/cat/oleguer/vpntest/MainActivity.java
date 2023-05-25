@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
                                 context.startService(stopIntent);
                                 Log.d(TAG,"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Stopping ...");
                             } catch (Exception e) {
-                                Log.d("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Excepction",e.getMessage());
+                                Log.d(TAG, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Excepction" + e.getMessage());
                             }
 
                             finish();

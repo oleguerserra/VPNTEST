@@ -18,8 +18,7 @@ public class NetworkTools {
     public NetworkTools(Context cx){
         setContext(cx);
         ConnectivityManager cm = (ConnectivityManager) cx.getSystemService(Context.CONNECTIVITY_SERVICE);
-        Log.d("---olelog---",cm.toString());
-
+        Log.d(TAG,"Loaded ConnectivityManager: " + cm.toString());
     }
 
     public boolean checkNetwork (){
@@ -28,10 +27,10 @@ public class NetworkTools {
         //return true;
     }
 
-    public static boolean hasConnection() {
-        return false;
-    }
-
+    /**
+     * Returns if VPN is enabled
+     * @return
+     */
     public boolean checkVPN(){
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
@@ -42,14 +41,13 @@ public class NetworkTools {
 
             NetworkCapabilities caps = cm.getNetworkCapabilities(networks[i]);
 
-            Log.i(TAG, "Network " + i + ": " + networks[i].toString());
-            Log.i(TAG, "VPN transport is: " + caps.hasTransport(NetworkCapabilities.TRANSPORT_VPN));
+            Log.d(TAG, "Network " + i + ": " + networks[i].toString());
+            Log.d(TAG, "VPN transport is: " + caps.hasTransport(NetworkCapabilities.TRANSPORT_VPN));
             if (caps.hasTransport(NetworkCapabilities.TRANSPORT_VPN)) return true;
-            Log.i(TAG, "NOT_VPN capability is: " + caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_VPN));
+            Log.d(TAG, "NOT_VPN capability is: " + caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_VPN));
 
         }
         return false;
-
     }
 
     public void setContext(Context context) {
