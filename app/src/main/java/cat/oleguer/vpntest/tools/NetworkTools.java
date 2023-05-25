@@ -1,13 +1,9 @@
 package cat.oleguer.vpntest.tools;
 
-import static androidx.fragment.app.FragmentManager.TAG;
-
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
-import android.net.NetworkInfo;
 import android.util.Log;
 
 public class NetworkTools {
@@ -29,7 +25,8 @@ public class NetworkTools {
 
     /**
      * Returns if VPN is enabled
-     * @return
+     *
+     * @return if VPN is enabled
      */
     public boolean checkVPN(){
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
