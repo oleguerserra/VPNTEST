@@ -10,8 +10,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.util.Log;
 
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.NavController;
+import androidx.navigation.NavDestination;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
@@ -39,13 +44,6 @@ public class MainActivity extends AppCompatActivity {
         appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
 
-        /*binding.fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });*/
     }
 
     @Override
@@ -63,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_exit) {
             new AlertDialog.Builder(this)
                     .setTitle("VPN Test Tools")
                     .setMessage("Are you sure you want to exit?")
@@ -74,16 +72,64 @@ public class MainActivity extends AppCompatActivity {
                                 Context context = MainActivity.super.getApplicationContext();
                                 Intent stopIntent = new Intent(context, BackgroundService.class);
                                 stopIntent.setAction("STOP");
-
+                                Log.d(TAG,"Stopping BackgroundService ...");
                                 context.startService(stopIntent);
-                                Log.d(TAG,"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Stopping ...");
                             } catch (Exception e) {
-                                Log.d(TAG, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Excepction" + e.getMessage());
+                                Log.d(TAG, "Error stopping BackgroundService: " + e.getMessage());
                             }
 
                             finish();
                         }
                     }).create().show();
+        }
+        if (id == R.id.action_main){
+
+            NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+            NavDestination currentDestination = navController.getCurrentDestination();
+
+            if (currentDestination != null) {
+                int fragmentId = currentDestination.getId();
+
+                if (fragmentId == R.id.FirstFragment) {
+                    Log.d(TAG,"------------------------------ FristFragment");
+                } else if (fragmentId == R.id.FileListFragment) {
+                    navController.navigate(R.id.action_FileListFragment_to_FirstFragment);
+                    Log.d(TAG,"------------------------------ FileListFragment");
+                }
+                // Add more conditions for other fragments if needed
+            } else {
+                // No fragment is currently active
+            }
+                //NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+                //Log.d(TAG,"------------------------------ FristFragment");
+                //navController.navigate(R.id.action_FileListFragment_to_FirstFragment);
+        }
+        if (id == R.id.action_list){
+
+            NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+            NavDestination currentDestination = navController.getCurrentDestination();
+
+            if (currentDestination != null) {
+                int fragmentId = currentDestination.getId();
+
+                if (fragmentId == R.id.FirstFragment) {
+                    Log.d(TAG,"------------------------------ FristFragment");
+                    navController.navigate(R.id.action_FirstFragment_to_FileListFragment);
+                } else if (fragmentId == R.id.FileListFragment) {
+                    Log.d(TAG,"------------------------------ FileListFragment");
+                }
+                // Add more conditions for other fragments if needed
+            } else {
+                // No fragment is currently active
+            }
+                //NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+                //navController.navigate(R.id.action_FirstFragment_to_FileListFragment);
+
+
+
+
+
+            //loadFragment(new FileListFragment());
         }
 
 
@@ -96,4 +142,13 @@ public class MainActivity extends AppCompatActivity {
         return NavigationUI.navigateUp(navController, appBarConfiguration)
                 || super.onSupportNavigateUp();
     }
+
+    /* private void loadFragment(Fragment fragment) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container, fragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+    }*/
+
 }

@@ -43,9 +43,10 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+
 public class BackgroundService extends Service {
     private static final String TAG = "BackgroundService";
-    private static int INTERVAL = 5000; // Interval for repeating the process in milliseconds
+    private static final int INTERVAL = 5000; // Interval for repeating the process in milliseconds
     private static final int NOTIFICATION_ID = 1;
     private static final String CHANNEL_ID = "testvpn_channel_id";
     private String hostname = "";
@@ -294,11 +295,11 @@ public class BackgroundService extends Service {
      * @param uuid
      */
     private void storeResponse(String timestamp, String myIp, String remoteIp, int port, String status, String responseIp, boolean match, String uuid) {
+        String fileStatus = "";
         String filepath = "";
         try {
-            // Append the response to a CSV file
 
-            File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            File path = getApplicationContext().getFilesDir();
             File file = new File(path, "response.csv");
 
             PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(file, true)));
@@ -306,8 +307,10 @@ public class BackgroundService extends Service {
             Log.d(TAG,file.getAbsolutePath()+ "," +timestamp + "," + myIp + "," + remoteIp + "," + port + "," + status + "," + responseIp + "," + match + "," + uuid + "," + localStoredIPs.get(myIp).toString());
             writer.close();
             filepath = file.getAbsolutePath();
+            fileStatus = "fet";
         } catch (IOException e) {
             Log.e(TAG, "Failed to store response: " + e.getMessage());
+            fileStatus = e.getMessage();
         }
 
         boolean checkNetwork = VPNUtils.checkNetwork(getApplicationContext());
@@ -332,8 +335,6 @@ public class BackgroundService extends Service {
 
         boolean checkServer = VPNUtils.checkServerConnection("www.omnium.cat",80);
 
-        NetworkTools nt = new NetworkTools(getApplicationContext());
-
         String connectionType = VPNUtils.getConnectionType(getApplicationContext());
 
 
@@ -342,7 +343,8 @@ public class BackgroundService extends Service {
         updateIntent.putExtra("openPortsCount", openPortsCount);
         updateIntent.putExtra("closedPortsCount", closedPortsCount);
         updateIntent.putExtra("totalConnectionsCount", totalConnectionsCount);
-        updateIntent.putExtra("vpnStatus","VPN Status: " + nt.checkVPN() + "\nNetwork Status: " + nt.checkNetwork());
+        updateIntent.putExtra("vpnStatus","VPN Status: " + VPNUtils.checkVPN(getApplicationContext())
+                                                    + "\nNetwork Status: " + VPNUtils.checkNetwork(getApplicationContext()));
         updateIntent.putExtra("myIp",myIp
                                                 + "\nCheck Network: " + checkNetwork
                                                 + "\nConnection Type: " + connectionType
@@ -352,7 +354,10 @@ public class BackgroundService extends Service {
                                                 //+ "\nDNS List: " + dnsListString
                                                 //+ "\nRoutes: " + routesListString
                                                 //+ "\nServer Running: " + checkServer);
-                                                + "\nLocation: " + localStoredIPs.get(myIp).toString());
+                                                + "\nLocation: " + localStoredIPs.get(myIp).toString()
+                                                + "\nLog files location: "+ fileStatus
+                                                + "\nFiles Dir: " + getApplicationContext().getFilesDir());
+
         sendBroadcast(updateIntent);
     }
 
@@ -430,7 +435,7 @@ public class BackgroundService extends Service {
      */
     public void logIP(String timestamp, String ip, String localOrRemote, String geoLoc) {
         try {
-            File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            File path = getApplicationContext().getFilesDir();
             File file = new File(path, "ips.csv");
             PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(file, true)));
 
@@ -453,5 +458,19 @@ public class BackgroundService extends Service {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         return sdf.format(new Date());
     }
+
+    /**
+     * Creates parent directories if necessary. Then returns file
+     *
+     * @param directory
+     * @param filename
+     * @return
+     */
+    private static File fileWithDirectoryAssurance(String directory, String filename) {
+        File dir = new File(directory);
+        if (!dir.exists()) dir.mkdirs();
+        return new File(directory + "/" + filename);
+    }
+
 
 }

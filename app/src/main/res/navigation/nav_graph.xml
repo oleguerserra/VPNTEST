@@ -9,5 +9,22 @@
         android:id="@+id/FirstFragment"
         android:name="cat.oleguer.vpntest.FirstFragment"
         android:label="@string/first_fragment_label"
-        tools:layout="@layout/fragment_first"/>
+        tools:layout="@layout/fragment_first">
+
+        <action
+            android:id="@+id/action_FirstFragment_to_FileListFragment"
+            app:destination="@id/FileListFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/FileListFragment"
+        android:name="cat.oleguer.vpntest.FileListFragment"
+        android:label="@string/second_fragment_label"
+        tools:layout="@layout/fragment_first">
+
+        <action
+            android:id="@+id/action_FileListFragment_to_FirstFragment"
+            app:destination="@id/FirstFragment" />
+    </fragment>
+
 </navigation>

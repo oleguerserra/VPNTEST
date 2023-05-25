@@ -91,22 +91,7 @@ public class FirstFragment extends Fragment {
         }
     }
 
-    /*
-    private void countMe(View view) throws Exception {
-        // Get the value of the text view
 
-        String countString = binding.textviewIp.getText().toString();
-        Log.d("---olelog---",countString);
-        // Convert value to a number and increment it
-        Integer count = Integer.parseInt(countString);
-        count++;
-        // Display the new value in the text view.
-        binding.textviewIp.setText(count.toString());
-
-        String countstring = count.toString();
-        Toast myToast = Toast.makeText(getActivity(),countstring, Toast.LENGTH_SHORT);
-        myToast.show();
-    }*/
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getActivity().getSystemService(Context.ACTIVITY_SERVICE);
@@ -117,39 +102,6 @@ public class FirstFragment extends Fragment {
         }
         return false;
     }
-
-
-
-
-    /*
-    public void onReceive(Context context, Intent intent) {
-        super.onReceive(context, intent);
-
-        if (intent.getAction() != null) {
-            if (intent.getAction().equals("UPDATE_COUNTERS")) {
-                int openPortsCount = intent.getIntExtra("openPortsCount", 0);
-                int closedPortsCount = intent.getIntExtra("closedPortsCount", 0);
-                int totalConnectionsCount = intent.getIntExtra("totalConnectionsCount", 0);
-
-                // Update the widget UI with the counter values
-                updateWidgetUI(context, openPortsCount, closedPortsCount, totalConnectionsCount);
-            }
-        }
-    }*/
-    /*
-    private void updateWidgetUI(Context context, int openPortsCount, int closedPortsCount, int totalConnectionsCount) {
-        //binding.textViewOleguer.setText("Open Ports: " + openPortsCount +"\n Closed Ports: " + closedPortsCount);
-
-        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.your_widget_layout);
-
-        views.setTextViewText(R.id.openPortsCountTextView, "Open Ports: " + openPortsCount);
-        views.setTextViewText(R.id.closedPortsCountTextView, "Closed Ports: " + closedPortsCount);
-        views.setTextViewText(R.id.totalConnectionsCountTextView, "Total Connections: " + totalConnectionsCount);
-
-        // Update the widget with the new RemoteViews
-        AppWidgetManager.getInstance(context).updateAppWidget(new ComponentName(context, YourAppWidgetProvider.class), views);
-    }
-    */
 
     @Override
     public void onDestroyView() {

@@ -13,14 +13,6 @@ public class BootReceiver extends BroadcastReceiver {
         if (intent.getAction() != null && intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
             StartBackgroundService.startBackgroundService(context);
         Log.d(TAG, "Boot completed received. Starting background service");
-            /*
-            Intent startIntent = new Intent(context, BackgroundService.class);
-            Log.d(TAG, "Start service" + startIntent.toString());
-            startIntent.setAction("START");
-            startIntent.putExtra("hostname", "vpn.serra.cat");
-            startIntent.putExtra("startPort", 80);
-            startIntent.putExtra("endPort", 84);
-            context.startService(startIntent);*/
         }
     }
 }

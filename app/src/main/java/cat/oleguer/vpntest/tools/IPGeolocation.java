@@ -13,20 +13,22 @@ public class IPGeolocation {
 
     private static final String TAG = "IPGeolocation";
 
+    /**
+     * Returns a Geolocation of an IP using the service https://ipgeolocation.io
+     *
+     * You need to obtain an API Key and store it in the build.gradle file
+     *
+     * @param ipAddress  IP we want to locate
+     * @param intent Intent of the APP to retrieve the API key stored
+     * @return a Geolocation of the IP
+     */
     public static Geolocation getLocalization(String ipAddress, Intent intent) {
 
         String ipgeolocation_api_key = intent.getStringExtra("ipgeolocation_api_key");
         Log.d(TAG, "ipgeolocation_api_key= " + ipgeolocation_api_key);
         try {
             // Create the API URL
-
-
             String apiUrl = "https://api.ipgeolocation.io/ipgeo?apiKey=" + ipgeolocation_api_key + "&ip=" + ipAddress;
-            //String apiUrl = "https://api.ipgeolocation.io/ipgeo?apiKey=110df17c1d27413cbd494088bb39a539&ip=" + ipAddress;
-            // Replace YOUR_API_KEY with your actual API key from IPGeolocation.io
-
-
-
 
             // Send HTTP GET request
             URL url = new URL(apiUrl);
@@ -43,20 +45,13 @@ public class IPGeolocation {
             }
             reader.close();
 
-            Gson gson = new Gson();
-
-            Geolocation geolocation = gson.fromJson(response.toString(), Geolocation.class);
-
-
             // Parse the JSON response
-            // Note: You'll need to use a JSON library such as Gson or Jackson to parse the JSON response
-
+            Gson gson = new Gson();
+            Geolocation geolocation = gson.fromJson(response.toString(), Geolocation.class);
 
             String jsonResponse = response.toString();
             Log.d(TAG, jsonResponse);
             return geolocation;
-            // Handle the geolocation data as per your requirements
-            // For example, you can extract and display the country, city, latitude, longitude, etc. from the response
 
         } catch (Exception e) {
             Log.d(TAG,e.getMessage());

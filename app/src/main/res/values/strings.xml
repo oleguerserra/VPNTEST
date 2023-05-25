@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">VPN TEST</string>
-    <string name="action_settings">Exit</string>
+    <string name="action_exit">Exit</string>
+    <string name="action_main">Main</string>
+    <string name="action_list">List</string>
     <!-- Strings used for fragments for navigation -->
     <string name="stop_button">Stop</string>
     <string name="previous">Previous</string>

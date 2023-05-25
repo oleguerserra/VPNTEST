@@ -9,13 +9,16 @@ import android.util.Log;
 
 public class StartBackgroundService {
     private static final String TAG = "StartBackgroundService";
-
     private static int INTERVAL = 5000; // Interval for repeating the process in milliseconds
     private static String HOSTNAME = "";
     private static int START_PORT = 80;
     private static int END_PORT = 81;
     private static String IPGEOLOCATION_API_KEY = "";
 
+    /**
+     * Starts the Background service inserting some configuration parameters into the Intent
+     * @param context
+     */
     public static void startBackgroundService (Context context){
 
         Intent startIntent = new Intent(context, BackgroundService.class);
@@ -34,10 +37,13 @@ public class StartBackgroundService {
     }
 
 
-
+    /**
+     * Retrieves the configuration variables from the build.gradle file and stores it to insert it to the Intent
+     *
+     * @param context
+     */
     private static void retrieveConfigurationVariables(Context context) {
         try {
-
             PackageManager packageManager = context.getPackageManager();
             String packageName = context.getPackageName();
             ApplicationInfo applicationInfo = packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA);
@@ -83,8 +89,6 @@ public class StartBackgroundService {
                 Log.d(TAG,"Configuration value not found in file build.gradle: manifestPlaceholders = [IPGEOLOCATION_API_KEY: \"XXXX\"]: ");
                 IPGEOLOCATION_API_KEY = "";
             }
-
-
         } catch (PackageManager.NameNotFoundException e) {
             // Handle exception
             e.printStackTrace();

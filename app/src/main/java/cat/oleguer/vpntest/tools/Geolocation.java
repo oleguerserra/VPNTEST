@@ -2,36 +2,37 @@ package cat.oleguer.vpntest.tools;
 
 import com.google.gson.annotations.SerializedName;
 
-/*
-            JSON RESPONSE EXAMPLE
-            {"ip":"188.241.120.119",
-            "continent_code":"EU",
-            "continent_name":"Europe",
-            "country_code2":"CH",
-            "country_code3":"CHE",
-            "country_name":"Switzerland",
-            "country_capital":"Bern",
-            "state_prov":"Zurich",
-            "district":"",
-            "city":"Zurich",
-            "zipcode":"8001",
-            "latitude":"47.37700",
-            "longitude":"8.53977",
-            "is_eu":false,
-            "calling_code":"+41",
-            "country_tld":".ch",
-            "languages":"de-CH,fr-CH,it-CH,rm",
-            "country_flag":"https://ipgeolocation.io/static/flags/ch_64.png",
-            "geoname_id":"6530239",
-            "isp":"Hydra Communications Ltd",
-            "connection_type":"",
-            "organization":"Hydra Communications Ltd",
-            "currency":{"code":"CHF","name":"Swiss Franc","symbol":"CHF"},
-            "time_zone":{"name":"Europe/Zurich","offset":1,"current_time":"2023-05-23 16:37:29.907+0200",
-            "current_time_unix":1684852649.907,
-            "is_dst":true,"dst_savings":1}}
-             */
 
+/**
+ * This class parses a JSON like the following and serializes an object representing it
+ * JSON RESPONSE EXAMPLE
+ *             {"ip":"188.241.120.119",
+ *             "continent_code":"EU",
+ *             "continent_name":"Europe",
+ *             "country_code2":"CH",
+ *             "country_code3":"CHE",
+ *             "country_name":"Switzerland",
+ *             "country_capital":"Bern",
+ *             "state_prov":"Zurich",
+ *             "district":"",
+ *             "city":"Zurich",
+ *             "zipcode":"8001",
+ *             "latitude":"47.37700",
+ *             "longitude":"8.53977",
+ *             "is_eu":false,
+ *             "calling_code":"+41",
+ *             "country_tld":".ch",
+ *             "languages":"de-CH,fr-CH,it-CH,rm",
+ *             "country_flag":"https://ipgeolocation.io/static/flags/ch_64.png",
+ *             "geoname_id":"6530239",
+ *             "isp":"Hydra Communications Ltd",
+ *             "connection_type":"",
+ *             "organization":"Hydra Communications Ltd",
+ *             "currency":{"code":"CHF","name":"Swiss Franc","symbol":"CHF"},
+ *             "time_zone":{"name":"Europe/Zurich","offset":1,"current_time":"2023-05-23 16:37:29.907+0200",
+ *             "current_time_unix":1684852649.907,
+ *             "is_dst":true,"dst_savings":1}}
+ */
 public class Geolocation {
     private String ip;
     @SerializedName("continent_code")
