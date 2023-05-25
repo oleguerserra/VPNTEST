@@ -6,9 +6,7 @@
     <!-- Strings used for fragments for navigation -->
     <string name="stop_button">Stop</string>
     <string name="previous">Previous</string>
-
     <string name="ip">IP: </string>
-    <string name="hello_second_fragment">Hello screen 2. Arg: %1$s</string>
     <string name="first_fragment_label">VPN Test tools</string>
     <string name="second_fragment_label">Screen 2</string>
     <string name="start_button">Start</string>
