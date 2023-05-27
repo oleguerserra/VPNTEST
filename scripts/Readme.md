@@ -100,8 +100,5 @@ Replace <interface> with the Wi-Fi interface of your computer and <api_key> with
 The script will generate logs in the logs directory.
 
 ## License
-This project is licensed under the MIT License.
-
-^
-
+This project is licensed under the GNU GENERAL PUBLIC LICENSE.
 
