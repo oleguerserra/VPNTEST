@@ -6,7 +6,7 @@ import sys
 import os
 import signal
 
-LOG_FILE = 'connections.csv'
+LOG_FILE = 'log/connections.csv'
 PORT_RANGE = range(25, 101)  # Change this to the range of ports you want to listen on
 
 # Store the PID of the background service process

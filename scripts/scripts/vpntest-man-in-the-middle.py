@@ -53,7 +53,7 @@ api_key = sys.argv[2]
 
 discovered_ips = set()
 
-with open('ips.csv', 'a', newline='') as csvfile:  # Open the file in append mode ('a')
+with open('log/ips.csv', 'a', newline='') as csvfile:  # Open the file in append mode ('a')
     writer = csv.writer(csvfile)
     # If the file is empty, write the header row
     if csvfile.tell() == 0:

@@ -28,7 +28,7 @@ If Python is not installed, use the package manager specific to your distributio
 
 ```bash
 sudo apt-get update
-sudo apt-get install python3
+sudo apt-get install python3 python3-venv
 ```
 
 macOS
