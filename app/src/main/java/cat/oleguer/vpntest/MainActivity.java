@@ -41,7 +41,9 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(binding.toolbar);
 
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
+
         appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
+
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
 
     }
@@ -83,56 +85,32 @@ public class MainActivity extends AppCompatActivity {
                     }).create().show();
         }
         if (id == R.id.action_main){
-
             NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
             NavDestination currentDestination = navController.getCurrentDestination();
-
             if (currentDestination != null) {
                 int fragmentId = currentDestination.getId();
-
                 if (fragmentId == R.id.FirstFragment) {
-                    Log.d(TAG,"------------------------------ FristFragment");
+                    Log.d(TAG,"FristFragment is loaded");
                 } else if (fragmentId == R.id.FileListFragment) {
                     navController.navigate(R.id.action_FileListFragment_to_FirstFragment);
-                    Log.d(TAG,"------------------------------ FileListFragment");
+                    Log.d(TAG,"FileListFragment is loaded");
                 }
-                // Add more conditions for other fragments if needed
-            } else {
-                // No fragment is currently active
             }
-                //NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-                //Log.d(TAG,"------------------------------ FristFragment");
-                //navController.navigate(R.id.action_FileListFragment_to_FirstFragment);
         }
         if (id == R.id.action_list){
-
             NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
             NavDestination currentDestination = navController.getCurrentDestination();
-
             if (currentDestination != null) {
                 int fragmentId = currentDestination.getId();
-
                 if (fragmentId == R.id.FirstFragment) {
-                    Log.d(TAG,"------------------------------ FristFragment");
+                    Log.d(TAG,"FristFragment is loaded");
                     navController.navigate(R.id.action_FirstFragment_to_FileListFragment);
                 } else if (fragmentId == R.id.FileListFragment) {
-                    Log.d(TAG,"------------------------------ FileListFragment");
+                    Log.d(TAG,"FileListFragment is loaded");
                 }
-                // Add more conditions for other fragments if needed
-            } else {
-                // No fragment is currently active
             }
-                //NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-                //navController.navigate(R.id.action_FirstFragment_to_FileListFragment);
 
-
-
-
-
-            //loadFragment(new FileListFragment());
         }
-
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -142,13 +120,4 @@ public class MainActivity extends AppCompatActivity {
         return NavigationUI.navigateUp(navController, appBarConfiguration)
                 || super.onSupportNavigateUp();
     }
-
-    /* private void loadFragment(Fragment fragment) {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container, fragment);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
-    }*/
-
 }
