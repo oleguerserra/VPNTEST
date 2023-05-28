@@ -3,6 +3,7 @@ from scapy.all import *
 import sys
 import csv
 from ipaddress import ip_address, IPv4Address, IPv6Address
+import socket
 
 def is_public_ip(ip):
     """
@@ -29,17 +30,32 @@ def get_ip_geolocation(ip, api_key):
     else:
         return None
 
+def get_service_from_port(port):
+    """
+    Attempts to guess the service based on the port number.
+    """
+    try:
+        service = socket.getservbyport(port)
+        return service
+    except OSError:
+        return 'Unknown'
+
 def packet_callback(packet):
     if TCP in packet:
         dst_ip = packet[IP].dst
+        dst_port = packet[TCP].dport
         if is_public_ip(dst_ip):
             if dst_ip not in discovered_ips:
                 discovered_ips.add(dst_ip)
                 geolocation = get_ip_geolocation(dst_ip, api_key)
                 if geolocation is not None:
+                    location = f"{geolocation['country']}-{geolocation['isp']}-{geolocation['organization']}-{geolocation['latitude']}.{geolocation['longitude']}"
+                    service = get_service_from_port(dst_port)
                     log_entry = [
                         dst_ip,
-                        f"{geolocation['country']}-{geolocation['isp']}-{geolocation['organization']}-{geolocation['latitude']}.{geolocation['longitude']}"
+                        location,
+                        dst_port,
+                        service
                     ]
                     writer.writerow(log_entry)
                     csvfile.flush()  # Flush the CSV file after each write
@@ -57,7 +73,7 @@ with open('log/ips.csv', 'a', newline='') as csvfile:  # Open the file in append
     writer = csv.writer(csvfile)
     # If the file is empty, write the header row
     if csvfile.tell() == 0:
-        writer.writerow(['IP', 'Location'])
+        writer.writerow(['IP', 'Location', 'Port', 'Service'])
 
     sniff(iface=interface, filter='tcp', prn=packet_callback)
 
