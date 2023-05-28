@@ -43,6 +43,7 @@ def get_service_from_port(port):
 def packet_callback(packet):
     if TCP in packet:
         dst_ip = packet[IP].dst
+        #print(f'IP:{dst_ip}')
         dst_port = packet[TCP].dport
         if is_public_ip(dst_ip):
             if dst_ip not in discovered_ips:
