@@ -100,5 +100,11 @@ Replace <interface> with the Wi-Fi interface of your computer and <api_key> with
 The script will generate logs in the logs directory.
 
 ## License
-This project is licensed under the GNU GENERAL PUBLIC LICENSE.
+
+This project is licensed under the [GNU GENERAL PUBLIC LICENSE](https://www.gnu.org/licenses/gpl-3.0.en.html). Please review the license file for more details.
+
+## Author
+
+This code was written by Oleguer Serra ([oleguer@serra.cat](mailto:oleguer@serra.cat)). If you have any questions or feedback, please feel free to reach out.
+
 
