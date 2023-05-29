@@ -7,7 +7,7 @@ import os
 import signal
 
 LOG_FILE = 'log/connections.csv'
-PORT_RANGE = range(25, 101)  # Change this to the range of ports you want to listen on
+PORT_RANGE = range(25, 505)  # Change this to the range of ports you want to listen on
 
 # Store the PID of the background service process
 background_service_pid = None
